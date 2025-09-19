@@ -1,35 +1,37 @@
-# Include OpenWrt build system rules
 include $(TOPDIR)/rules.mk
 
-# Package info
 PKG_NAME:=helloworld
 PKG_VERSION:=1.0
-PKG_RELEASE:=1
+PKG_RELEASE:=r1
 
-# Include standard package definitions
 include $(INCLUDE_DIR)/package.mk
 
-# Package metadata
 define Package/helloworld
   SECTION:=utils
   CATEGORY:=Utilities
-  TITLE:=Hello World Program
+  TITLE:=Hello World Package
+  ARCH:=all
 endef
 
 define Package/helloworld/description
- A simple Hello World program for OpenWrt.
+  Simple Hello World C program
 endef
 
-# Compile step
+# Copy sources to the build directory
+define Build/Prepare
+        mkdir -p $(PKG_BUILD_DIR)
+        $(CP) ./src/* $(PKG_BUILD_DIR)/
+endef
+
+# Compile the source file
 define Build/Compile
-	$(TARGET_CC) $(TARGET_CFLAGS) -o $(PKG_BUILD_DIR)/helloworld $(CURDIR)/src/helloworld.c
+        $(TARGET_CC) $(PKG_BUILD_DIR)/helloworld.c -o $(PKG_BUILD_DIR)/helloworld
 endef
 
-# Install step
+# Install the compiled binary into the package
 define Package/helloworld/install
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/helloworld $(1)/usr/bin/
+        $(INSTALL_DIR) $(1)/usr/bin
+        $(INSTALL_BIN) $(PKG_BUILD_DIR)/helloworld $(1)/usr/bin/
 endef
 
-# Evaluate package
 $(eval $(call BuildPackage,helloworld))
